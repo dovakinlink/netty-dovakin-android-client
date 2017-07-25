@@ -1,6 +1,7 @@
 package org.dovakin.push.client.core;
 
 import org.dovakin.push.client.core.codec.NGLSProtocolCodec;
+import org.dovakin.push.client.core.handler.NGLSClientHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ public class NGLSInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS));
         pipeline.addLast(new NGLSProtocolCodec());
+        pipeline.addLast(new NGLSClientHandler());
 
     }
 }
