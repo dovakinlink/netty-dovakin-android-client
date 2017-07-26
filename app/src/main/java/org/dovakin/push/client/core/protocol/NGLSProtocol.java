@@ -14,7 +14,9 @@ public class NGLSProtocol {
      */
     private final static int HEAD = 0x29;
 
-
+    /**
+     * 协议动作类型
+     */
     private int ACTION_TYPE;
 
     /**

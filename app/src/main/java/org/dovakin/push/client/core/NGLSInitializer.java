@@ -1,5 +1,6 @@
 package org.dovakin.push.client.core;
 
+import org.dovakin.push.client.NGLSClient;
 import org.dovakin.push.client.core.codec.NGLSProtocolCodec;
 import org.dovakin.push.client.core.handler.NGLSClientHandler;
 
@@ -19,8 +20,15 @@ public class NGLSInitializer extends ChannelInitializer<SocketChannel>{
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new IdleStateHandler(0, 4, 0, TimeUnit.SECONDS));
+        /** 心跳检测处理器*/
+        pipeline.addLast(
+                new IdleStateHandler(NGLSClient.readerIdleTime,
+                        NGLSClient.writerIdleTime,
+                        NGLSClient.allIdleTime,
+                        TimeUnit.SECONDS));
+        /** NGLS协议编解码器*/
         pipeline.addLast(new NGLSProtocolCodec());
+        /** NGLS数据处理*/
         pipeline.addLast(new NGLSClientHandler());
 
     }

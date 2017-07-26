@@ -24,6 +24,7 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
     protected void messageReceived(ChannelHandlerContext ctx, NGLSProtocol msg) throws Exception {
 
         try {
+            //TODO 设计事件分发机制
             int action = msg.getTYPE();
             switch (action){
                 case EventType.PUSH:
@@ -53,12 +54,51 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
+        try {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    NGLSClient.mNotifyInstance.onActive();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+        try {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    NGLSClient.mNotifyInstance.onInactive();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+        try {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    NGLSClient.mNotifyInstance.onException(cause.getMessage());
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
+    //TODO 添加心跳机制
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        super.userEventTriggered(ctx, evt);
+    }
 }
