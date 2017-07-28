@@ -1,20 +1,19 @@
-package org.dovakin.push.client;
+package org.dovakin.push.client.core;
 
 import android.content.Context;
 
-import org.dovakin.push.client.core.NGLSInitializer;
 import org.dovakin.push.client.core.bean.AuthAction;
+import org.dovakin.push.client.core.event.EventType;
 import org.dovakin.push.client.core.exception.AuthParamInvailbleException;
 import org.dovakin.push.client.core.exception.ClientInitFailedException;
 import org.dovakin.push.client.core.protocol.NGLSProtocol;
 import org.dovakin.push.client.core.service.NotifyService;
-
-import java.net.InetSocketAddress;
+import org.dovakin.push.client.core.utils.JsonUtil;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -96,12 +95,19 @@ public class NGLSClient {
                     Bootstrap b = new Bootstrap();
                     b.group(group)
                             .channel(NioSocketChannel.class)
-                            .option(ChannelOption.SO_KEEPALIVE, true)
                             .handler(new NGLSInitializer());
 
-                    final ChannelFuture future = b.connect(new InetSocketAddress(ip, port));
-                    globalChannel = future.channel();
-                    future.sync();
+                    final ChannelFuture future = b.connect(ip, port);
+                    future.addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            if(future.isSuccess()){
+                                globalChannel = future.channel();
+                            } else {
+                                System.out.println("连接失败！...");
+                            }
+                        }
+                    }).sync();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (Exception e1){
@@ -120,7 +126,9 @@ public class NGLSClient {
         }
         if(globalChannel == null)
             throw new ClientInitFailedException("Client Init Failed");
-
-        NGLSProtocol nglsProtocol = new NGLSProtocol();
+        String content = JsonUtil.beanToString(authAction);
+        NGLSProtocol nglsProtocol = new NGLSProtocol(content.length(), content.getBytes());
+        nglsProtocol.setTYPE(EventType.AUTH);
+        globalChannel.writeAndFlush(nglsProtocol);
     }
 }

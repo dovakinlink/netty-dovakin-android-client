@@ -22,4 +22,13 @@ public class JsonUtil {
         }
         return null;
     }
+
+    public static <T> String beanToString(T bean){
+        try {
+            return gson.toJson(bean, bean.getClass());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

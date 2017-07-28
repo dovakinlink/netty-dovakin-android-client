@@ -18,5 +18,7 @@ public interface NotifyService {
 
     public void onInactive();
 
+    public void onNGLSActive();
+
     public void onException(String e);
 }

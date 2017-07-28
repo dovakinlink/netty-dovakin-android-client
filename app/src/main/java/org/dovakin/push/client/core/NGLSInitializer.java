@@ -1,6 +1,5 @@
 package org.dovakin.push.client.core;
 
-import org.dovakin.push.client.NGLSClient;
 import org.dovakin.push.client.core.codec.NGLSProtocolCodec;
 import org.dovakin.push.client.core.handler.NGLSClientHandler;
 

@@ -1,10 +1,9 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "org.dovakin.push.client"
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
@@ -17,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions{
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -26,6 +29,15 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
-    compile 'io.netty:netty-all:5.0.0.Alpha2'
+    compile 'io.netty:netty-all:4.1.13.Final'
     compile 'com.google.code.gson:gson:2.8.1'
 }
+
+task makeJar(type: Copy){
+    delete 'build/libs/classes.jar'
+    from('build/intermediates/bundles/debug/')
+    into('build/libs/')
+    include('classes.jar')
+    rename('classes.jar','netty-dovakin-client-0.3.jar')
+}
+makeJar.dependsOn(build)
