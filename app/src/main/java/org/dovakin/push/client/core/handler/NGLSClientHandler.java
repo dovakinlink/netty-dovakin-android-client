@@ -6,23 +6,48 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import org.dovakin.push.client.core.NGLSClient;
-import org.dovakin.push.client.core.bean.AuthAction;
 import org.dovakin.push.client.core.bean.PushAction;
 import org.dovakin.push.client.core.event.EventType;
 import org.dovakin.push.client.core.protocol.NGLSProtocol;
 import org.dovakin.push.client.core.utils.JsonUtil;
 
+import java.util.concurrent.TimeUnit;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
+import io.netty.util.TimerTask;
 
 /**
  * Created by liuhuanchao on 2017/7/25.
  */
 
-public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>{
+public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
+            /*implements TimerTask*/{
 
     private Context context = NGLSClient.mContext;
+/*    private final Bootstrap bootstrap;
+    private final Timer timer;
+    private final String host;
+    private final int port;
+    private volatile boolean reconnect = true;
+    private int attemps;*/
+
+    public NGLSClientHandler(/*Bootstrap bootstrap, Timer timer, int port, String host, boolean reconnect*/){
+/*        this.bootstrap = bootstrap;
+        this.timer = new HashedWheelTimer();
+        this.port = port;
+        this.host = host;
+        this.reconnect = reconnect;*/
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -37,6 +62,8 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
         }catch (Exception e){
             e.printStackTrace();
         }
+
+
     }
 
     @Override
@@ -52,6 +79,15 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
         }catch (Exception e){
             e.printStackTrace();
         }
+/*
+        if(reconnect){
+            if (attemps < 12){
+                attemps++;
+                int timeout = 2 << attemps;
+                timer.newTimeout(this,timeout, TimeUnit.MILLISECONDS);
+            }
+        }*/
+
     }
 
     @Override
@@ -69,10 +105,18 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
         }
     }
 
-    //TODO 添加心跳机制
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        super.userEventTriggered(ctx, evt);
+        if (evt instanceof IdleStateEvent){
+            IdleState state = ((IdleStateEvent) evt).state();
+            if(state == IdleState.WRITER_IDLE){
+                NGLSProtocol protocol = new NGLSProtocol(0, new byte[]{});
+                protocol.setTYPE(EventType.HEART);
+                ctx.writeAndFlush(protocol);
+            } else {
+                super.userEventTriggered(ctx, evt);
+            }
+        }
     }
 
     @Override
@@ -117,4 +161,23 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
             e.printStackTrace();
         }
     }
+
+/*    @Override
+    public void run(Timeout timeout) throws Exception {
+        ChannelFuture future;
+        synchronized (NGLSClient.b){
+            future = NGLSClient.b.connect(host, port);
+        }
+        future.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                boolean isSuccess = future.isSuccess();
+                if(!isSuccess){
+                    future.channel().pipeline().fireChannelInactive();
+                } else {
+                    System.out.println("重连成功！");
+                }
+            }
+        });
+    }*/
 }

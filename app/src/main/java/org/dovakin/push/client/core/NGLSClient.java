@@ -28,6 +28,8 @@ public class NGLSClient {
     /** 事件通知接口实例*/
     public static NotifyService mNotifyInstance = null;
 
+    public static Bootstrap b = null;
+
     private final EventLoopGroup group = new NioEventLoopGroup();
     private Channel globalChannel;
 
@@ -48,6 +50,10 @@ public class NGLSClient {
     private int port;
 
     private NGLSClient(){}
+
+    public void setHeartbeatIdle(int idleTime){
+        writerIdleTime = idleTime;
+    }
 
     /**
      * 初始化客户端实例
@@ -92,7 +98,7 @@ public class NGLSClient {
             @Override
             public void run() {
                 try {
-                    Bootstrap b = new Bootstrap();
+                    b = new Bootstrap();
                     b.group(group)
                             .channel(NioSocketChannel.class)
                             .handler(new NGLSInitializer());
@@ -130,5 +136,21 @@ public class NGLSClient {
         NGLSProtocol nglsProtocol = new NGLSProtocol(content.length(), content.getBytes());
         nglsProtocol.setTYPE(EventType.AUTH);
         globalChannel.writeAndFlush(nglsProtocol);
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }
