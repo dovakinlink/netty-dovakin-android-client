@@ -1,64 +1,42 @@
 package org.dovakin.push.client.core.handler;
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
-import com.google.gson.Gson;
 
 import org.dovakin.push.client.core.NGLSClient;
-import org.dovakin.push.client.core.bean.PushAction;
+import org.dovakin.push.client.core.bean.AuthAction;
+import org.dovakin.push.client.core.event.BaseEvent;
+import org.dovakin.push.client.core.event.ChannelEvent;
 import org.dovakin.push.client.core.event.EventType;
 import org.dovakin.push.client.core.protocol.NGLSProtocol;
 import org.dovakin.push.client.core.utils.JsonUtil;
+import org.greenrobot.eventbus.EventBus;
 
-import java.util.concurrent.TimeUnit;
-
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.CharsetUtil;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timeout;
-import io.netty.util.Timer;
-import io.netty.util.TimerTask;
 
 /**
  * Created by liuhuanchao on 2017/7/25.
  */
 
 public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
-            /*implements TimerTask*/{
+           {
 
     private Context context = NGLSClient.mContext;
-/*    private final Bootstrap bootstrap;
-    private final Timer timer;
-    private final String host;
-    private final int port;
-    private volatile boolean reconnect = true;
-    private int attemps;*/
 
-    public NGLSClientHandler(/*Bootstrap bootstrap, Timer timer, int port, String host, boolean reconnect*/){
-/*        this.bootstrap = bootstrap;
-        this.timer = new HashedWheelTimer();
-        this.port = port;
-        this.host = host;
-        this.reconnect = reconnect;*/
+    public NGLSClientHandler(){
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         try {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    NGLSClient.mNotifyInstance.onActive();
-                }
-            });
+            EventBus.getDefault().post(new ChannelEvent(EventType.ON_ACTIVE, null));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -70,36 +48,17 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         try {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    NGLSClient.mNotifyInstance.onInactive();
-                }
-            });
+            EventBus.getDefault().post(new ChannelEvent(EventType.ON_INACTIVE, null));
         }catch (Exception e){
             e.printStackTrace();
         }
-/*
-        if(reconnect){
-            if (attemps < 12){
-                attemps++;
-                int timeout = 2 << attemps;
-                timer.newTimeout(this,timeout, TimeUnit.MILLISECONDS);
-            }
-        }*/
-
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         try {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    NGLSClient.mNotifyInstance.onException(cause.getMessage());
-                }
-            });
+            EventBus.getDefault().post(new ChannelEvent(EventType.ON_EXCEPTION, cause.getMessage()));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -123,9 +82,18 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
     protected void channelRead0(ChannelHandlerContext ctx, NGLSProtocol msg) throws Exception {
 
         try {
-            //TODO 设计事件分发机制
-            int action = msg.getTYPE();
-            switch (action){
+            final int action = msg.getTYPE();
+            final Object obj
+                    = JsonUtil.readBytes(msg.getContent(), Object.class);
+            EventBus.getDefault().post(new BaseEvent(action, obj));
+            //NGLSClient.mNotifyInstance.notify(action, obj);
+/*            ((Activity)context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    NGLSClient.mNotifyInstance.notify(action, obj);
+                }
+            });*/
+/*            switch (action){
                 case EventType.PUSH:
                     String str = new String(msg.getContent(), CharsetUtil.UTF_8);
                     PushAction a = new Gson().fromJson(str,PushAction.class);
@@ -156,28 +124,10 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
                     break;
                 default:
                     break;
-            }
+            }*/
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-/*    @Override
-    public void run(Timeout timeout) throws Exception {
-        ChannelFuture future;
-        synchronized (NGLSClient.b){
-            future = NGLSClient.b.connect(host, port);
-        }
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                boolean isSuccess = future.isSuccess();
-                if(!isSuccess){
-                    future.channel().pipeline().fireChannelInactive();
-                } else {
-                    System.out.println("重连成功！");
-                }
-            }
-        });
-    }*/
 }

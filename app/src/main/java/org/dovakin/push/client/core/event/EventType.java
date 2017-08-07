@@ -11,4 +11,8 @@ public class EventType {
     public static final int AUTH_SUCCESS = 0x02;
     public static final int AUTH_FAILED = 0x03;
     public static final int HEART = 0x04;
+
+    public static final String ON_ACTIVE = "onActive";
+    public static final String ON_INACTIVE = "onInActive";
+    public static final String ON_EXCEPTION = "onException";
 }

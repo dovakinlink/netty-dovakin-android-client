@@ -1,6 +1,7 @@
 package org.dovakin.push.client.core;
 
 import android.content.Context;
+import android.os.Handler;
 
 import org.dovakin.push.client.core.bean.AuthAction;
 import org.dovakin.push.client.core.event.EventType;
@@ -19,7 +20,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 /**
- * Created by liuhuanchao on 2017/7/25.
+ * Created by Link on 2017/7/25.
  */
 public class NGLSClient {
 
@@ -27,6 +28,8 @@ public class NGLSClient {
     private static NGLSClient mInstance = null;
     /** 事件通知接口实例*/
     public static NotifyService mNotifyInstance = null;
+    /** 事件通知主线程Handler*/
+    public static Handler handler = null;
 
     public static Bootstrap b = null;
 
@@ -36,13 +39,13 @@ public class NGLSClient {
     /** SOCKET读空闲默认时间*/
     private static final int DEFAULT_READER_IDEL_TIME = 0;
     /** SOCKET写空闲默认时间*/
-    private static final int DEFAULT_WRITER_IDEL_TIME = 4;
+    private static final int DEFAULT_WRITER_IDEL_TIME = 160;
     /** SOCKET全部空闲时间*/
     private static final int DEFAULT_ALL_IDEL_TIME = 0;
 
-    public static int readerIdleTime = DEFAULT_READER_IDEL_TIME;
-    public static int writerIdleTime = DEFAULT_WRITER_IDEL_TIME;
-    public static int allIdleTime = DEFAULT_ALL_IDEL_TIME;
+    private int readerIdleTime = DEFAULT_READER_IDEL_TIME;
+    private int writerIdleTime = DEFAULT_WRITER_IDEL_TIME;
+    private int allIdleTime = DEFAULT_ALL_IDEL_TIME;
 
     public static Context mContext;
 
@@ -90,6 +93,21 @@ public class NGLSClient {
         return this;
     }
 
+    public NGLSClient addListener(Handler handler){
+        this.handler = handler;
+        return this;
+    }
+
+    /**
+     * 设置心跳间隔
+     * @param idle
+     * @return
+     */
+    public NGLSClient setHeartBeatTimeIdle(int idle){
+        this.readerIdleTime = idle;
+        return this;
+    }
+
     /**
      * 启动NGLS客户端
      */
@@ -122,8 +140,8 @@ public class NGLSClient {
             }
         });
         thread.start();
-
     }
+
 
     public void login(AuthAction authAction) throws AuthParamInvailbleException, ClientInitFailedException {
         if (authAction == null) throw new NullPointerException();
