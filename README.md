@@ -16,13 +16,13 @@
 
 ### <a name="step 1">Step 1:</a> 注册EventBus
 你需要将你的Service类注册到EventBus总线上，并通过接收 **BaseEvent** 和 **ChannelEvent** 事件，来编写SDK事件的回调处理
-```
+```java
     EventBus.getDefault().register(this);
 ```
 
 数据接收回调处理:
-```
-    @Subscribe(threadMode = ThreadMode.MAIN)
+```java
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleNotify(BaseEvent baseEvent){
         switch (baseEvent.getEventType()){
             case EventType.AUTH:
@@ -44,7 +44,7 @@
     }
 ```
 TCP连接状态改变回调处理：
-```
+```java
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleChannelEvent(ChannelEvent channelEvent){
         String eventType = channelEvent.getEventType();
@@ -75,7 +75,7 @@ ON_EXCEPTION | 服务器异常 | String
 **NGLS**是Dovakin内置的一个简易自定义推送协议，它提供了最简单的推送协议功能
 
 NGLSClient的启动过程是异步非阻塞的，所以你可以自由选择合适的时机**在主线程**中进行启动，启动代码很简单，下面是一个完整的例子
-```
+```java
         client = NGLSClient.init(MainActivity.this)
                 .address("192.168.0.1", 9999)
                 .setHeartBeatTimeIdle(160);
@@ -93,7 +93,7 @@ addListener | 通过添加实现了NotifyService接口的实例来以内置回�
 ### <a name="step 3">Step 3:</a> 通过NGLSClient.login()鉴权（注册NGLS连接）
 关于鉴权的逻辑，根据集成Dovakin服务的后端逻辑不同而不通，目前仅提供最简单的实现，即明文传输**UserName** **Password**
 
-```
+```java
                 AuthAction authAction = new AuthAction();
                 authAction.setClientId(/** your username*/);
                 authAction.setPassword(/** your password*/);
