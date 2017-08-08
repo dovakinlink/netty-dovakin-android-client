@@ -54,3 +54,28 @@ TCP连接状态改变回调处理：
         }
     }
 ```
+SDK中提供了几种内置事件状态，可以通过比对 EventType 中的静态变量来对事件类型进行判别
+**EventType**
+type | 类型说明 | 类型
+-----|---------|--------
+PUSH | 推送    | Integer
+AUTH | 鉴权    | Integer
+AUTH_SUCCESS | 鉴权成功 | Integer
+AUTH_FAILED  | 鉴权失败 | Integer
+HEART | 心跳回执 | Integer
+ON_ACTIVE | TCP连接建立 | String
+ON_INACTIVE | TCP连接断开 | String
+ON_EXCEPTION | 服务器异常 | String
+
+### <a name="step 2">Step 2:</a> 启动NGLSClient
+**NGLS**是Dovakin内置的一个简易自定义推送协议，它提供了最简单的推送协议功能
+
+NGLSClient的启动过程是异步非阻塞的，所以你可以自由选择合适的时机**在主线程**中进行启动，启动代码很简单，下面是一个完整的例子
+```
+        client = NGLSClient.init(MainActivity.this)
+                .address("192.168.0.1", 9999)
+                .setHeartBeatTimeIdle(160);
+        client.start();
+```
+NGLSClient中提供了一些链式
+
