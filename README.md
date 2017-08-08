@@ -7,8 +7,8 @@
 
 除了SDK本身，你仍然需要在你的build.gradle中添加如下代码，添加[netty](https://github.com/netty/netty),   [gson](https://github.com/google/gson)，
 [EventBus3.0](https://github.com/greenrobot/EventBus)的支持
-```
-    compile 'io.netty:netty-all:4.1.13.Final'
+```gradle
+    compile 'io.netty:netty-all:4.1.13.Final'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'org.greenrobot:eventbus:3.0.0'
 ```
@@ -76,10 +76,10 @@ ON_EXCEPTION | 服务器异常 | String
 
 NGLSClient的启动过程是异步非阻塞的，所以你可以自由选择合适的时机**在主线程**中进行启动，启动代码很简单，下面是一个完整的例子
 ```java
-        client = NGLSClient.init(MainActivity.this)
-                .address("192.168.0.1", 9999)
-                .setHeartBeatTimeIdle(160);
-        client.start();
+client = NGLSClient.init(MainActivity.this)
+    .address("192.168.0.1", 9999)
+    .setHeartBeatTimeIdle(160);
+client.start();
 ```
 NGLSClient中提供了一些链式配置函数
 
@@ -94,15 +94,15 @@ addListener | 通过添加实现了NotifyService接口的实例来以内置回�
 关于鉴权的逻辑，根据集成Dovakin服务的后端逻辑不同而不通，目前仅提供最简单的实现，即明文传输**UserName** **Password**
 
 ```java
-                AuthAction authAction = new AuthAction();
-                authAction.setClientId(/** your username*/);
-                authAction.setPassword(/** your password*/);
-                try {
-                    client.login(authAction);
-                } catch (AuthParamInvailbleException e) {
-                    e.printStackTrace();
-                } catch (ClientInitFailedException e) {
-                    e.printStackTrace();
-                }
+    AuthAction authAction = new AuthAction();
+    authAction.setClientId(/** your username*/);
+    authAction.setPassword(/** your password*/);
+    try {
+        client.login(authAction);
+    } catch (AuthParamInvailbleException e) {
+        e.printStackTrace();
+    } catch (ClientInitFailedException e) {
+        e.printStackTrace();
+    }
 ```
 
