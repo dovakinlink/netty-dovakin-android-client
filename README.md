@@ -2,6 +2,9 @@
 **Dovakin For Android SDK**，对Android应用与集成Dovakin推送的服务之间的连接调用进行了良好的封装，通过基于[EventBus 3.0](https://github.com/greenrobot/EventBus)的事件总线机制，提供了包括TCP连接状态改变、数据获取等回调事件，无需关注更多细节
 
 ## 依赖
+目前SDK的最新release版本为v0.3.0，你可以在[这里](https://github.com/dovakinlink/netty-dovakin-android-client/releases/tag/v0.3.0)下载
+通过File->Project Structure->Dependencies->Add Jardependency操作来添加SDK依赖
+
 除了SDK本身，你仍然需要在你的build.gradle中添加如下代码，添加[netty](https://github.com/netty/netty),   [gson](https://github.com/google/gson)，
 [EventBus3.0](https://github.com/greenrobot/EventBus)的支持
 ```
