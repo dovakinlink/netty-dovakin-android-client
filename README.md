@@ -1,12 +1,13 @@
 # 关于SDK
-**Dovakin For Android SDK**，对Android应用与集成Dovakin推送的服务之间的连接调用进行了良好的封装，通过基于[EventBus 3.0](https://github.com/greenrobot/EventBus)的事件总线机制，提供了包括TCP连接状态改变、数据获取等回调事件，无需关注更多细节
+**Dovakin Client SDK For Android**，对Android应用与集成[Dovakin推送](https://github.com/dovakinlink/Netty-Dovakin-PushService)的服务之间的连接调用进行了良好的封装，通过基于[EventBus 3.0](https://github.com/greenrobot/EventBus)的事件总线机制，提供了包括TCP连接状态改变、数据获取等回调事件，无需关注更多细节
 
 ## 依赖
-目前SDK的最新release版本为v0.3.0，你可以在[这里](https://github.com/dovakinlink/netty-dovakin-android-client/releases/tag/v0.3.0)下载
+你可以在[这里](https://github.com/dovakinlink/netty-dovakin-android-client/releases/tag/v0.3.0)下载SDK的最新release版本
 通过File->Project Structure->Dependencies->Add Jardependency操作来添加SDK依赖
 
-除了SDK本身，你仍然需要在你的build.gradle中添加如下代码，添加[netty](https://github.com/netty/netty),   [gson](https://github.com/google/gson)，
+除了SDK本身，你仍然需要在你的build.gradle中添加如下代码，添加[Netty](https://github.com/netty/netty),   [Gson](https://github.com/google/gson)，
 [EventBus3.0](https://github.com/greenrobot/EventBus)的支持
+#### Gradle
 ```gradle
     compile 'io.netty:netty-all:4.1.13.Final'
     compile 'com.google.code.gson:gson:2.8.1'
@@ -17,7 +18,7 @@
 ### <a name="step 1">Step 1:</a> 注册EventBus
 你需要将你的Service类注册到EventBus总线上，并通过接收 **BaseEvent** 和 **ChannelEvent** 事件，来编写SDK事件的回调处理
 ```java
-    EventBus.getDefault().register(this);
+EventBus.getDefault().register(this);
 ```
 
 数据接收回调处理:
