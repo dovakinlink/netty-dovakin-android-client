@@ -56,10 +56,11 @@ TCP连接状态改变回调处理：
 ```
 SDK中提供了几种内置事件状态，可以通过比对 EventType 中的静态变量来对事件类型进行判别
 **EventType**
+
 type | 类型说明 | 类型
 -----|---------|--------
-PUSH | 推送    | Integer
-AUTH | 鉴权    | Integer
+PUSH | 推送 | Integer
+AUTH | 鉴权 | Integer
 AUTH_SUCCESS | 鉴权成功 | Integer
 AUTH_FAILED  | 鉴权失败 | Integer
 HEART | 心跳回执 | Integer
@@ -77,5 +78,28 @@ NGLSClient的启动过程是异步非阻塞的，所以你可以自由选择合�
                 .setHeartBeatTimeIdle(160);
         client.start();
 ```
-NGLSClient中提供了一些链式
+NGLSClient中提供了一些链式配置函数
+
+函数名 | 函数作用 | 参数 | 是否必须
+------|----------|------|--------
+init | 初始化 | 上下文实例 | 是
+address | 配置远程服务HOST及PORT | HOST/PORT | 是
+setHeartBeatTimeIdle | 设置心跳间隔 | 心跳间隔（单位：秒） | 否 
+addListener | 通过添加实现了NotifyService接口的实例来以内置回调的方式监听各类回调事件 | 实现了NotifyService接口的实例 | 否
+
+### <a name="step 3">Step 3:</a> 通过NGLSClient.login()鉴权（注册NGLS连接）
+关于鉴权的逻辑，根据集成Dovakin服务的后端逻辑不同而不通，目前仅提供最简单的实现，即明文传输**UserName** **Password**
+
+```
+                AuthAction authAction = new AuthAction();
+                authAction.setClientId(/** your username*/);
+                authAction.setPassword(/** your password*/);
+                try {
+                    client.login(authAction);
+                } catch (AuthParamInvailbleException e) {
+                    e.printStackTrace();
+                } catch (ClientInitFailedException e) {
+                    e.printStackTrace();
+                }
+```
 
