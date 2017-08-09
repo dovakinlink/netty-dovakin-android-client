@@ -6,9 +6,9 @@ package org.dovakin.push.client.core.event;
 
 public class BaseEvent {
     private int eventType;
-    private Object object;
+    private String object;
 
-    public BaseEvent(int eventType, Object object){
+    public BaseEvent(int eventType, String object){
         this.eventType = eventType;
         this.object = object;
     }
@@ -21,11 +21,11 @@ public class BaseEvent {
         this.eventType = eventType;
     }
 
-    public Object getObject() {
+    public String getObject() {
         return object;
     }
 
-    public void setObject(Object object) {
+    public void setObject(String object) {
         this.object = object;
     }
 }

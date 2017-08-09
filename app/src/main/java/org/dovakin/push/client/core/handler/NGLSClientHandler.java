@@ -83,8 +83,10 @@ public class NGLSClientHandler extends SimpleChannelInboundHandler<NGLSProtocol>
 
         try {
             final int action = msg.getTYPE();
-            final Object obj
-                    = JsonUtil.readBytes(msg.getContent(), Object.class);
+
+/*            final Object obj
+                    = JsonUtil.readBytes(msg.getContent(), Object.class);*/
+            String obj = new String(msg.getContent());
             EventBus.getDefault().post(new BaseEvent(action, obj));
             //NGLSClient.mNotifyInstance.notify(action, obj);
 /*            ((Activity)context).runOnUiThread(new Runnable() {

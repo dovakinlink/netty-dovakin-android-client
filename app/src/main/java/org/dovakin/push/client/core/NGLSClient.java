@@ -1,7 +1,6 @@
 package org.dovakin.push.client.core;
 
 import android.content.Context;
-import android.os.Handler;
 
 import org.dovakin.push.client.core.bean.AuthAction;
 import org.dovakin.push.client.core.event.EventType;
@@ -28,9 +27,6 @@ public class NGLSClient {
     private static NGLSClient mInstance = null;
     /** 事件通知接口实例*/
     public static NotifyService mNotifyInstance = null;
-    /** 事件通知主线程Handler*/
-    public static Handler handler = null;
-
     public static Bootstrap b = null;
 
     private final EventLoopGroup group = new NioEventLoopGroup();
@@ -43,9 +39,9 @@ public class NGLSClient {
     /** SOCKET全部空闲时间*/
     private static final int DEFAULT_ALL_IDEL_TIME = 0;
 
-    private int readerIdleTime = DEFAULT_READER_IDEL_TIME;
-    private int writerIdleTime = DEFAULT_WRITER_IDEL_TIME;
-    private int allIdleTime = DEFAULT_ALL_IDEL_TIME;
+    public static int readerIdleTime = DEFAULT_READER_IDEL_TIME;
+    public static int writerIdleTime = DEFAULT_WRITER_IDEL_TIME;
+    public static int allIdleTime = DEFAULT_ALL_IDEL_TIME;
 
     public static Context mContext;
 
@@ -90,11 +86,6 @@ public class NGLSClient {
      */
     public NGLSClient addListener(NotifyService service){
         this.mNotifyInstance = service;
-        return this;
-    }
-
-    public NGLSClient addListener(Handler handler){
-        this.handler = handler;
         return this;
     }
 
@@ -171,4 +162,5 @@ public class NGLSClient {
     public void setPort(int port) {
         this.port = port;
     }
+
 }

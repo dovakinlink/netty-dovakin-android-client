@@ -6,9 +6,9 @@ package org.dovakin.push.client.core.event;
 
 public class ChannelEvent {
     private String eventType;
-    private Object object;
+    private String object;
 
-    public ChannelEvent(String eventType, Object object){
+    public ChannelEvent(String eventType, String object){
         this.eventType = eventType;
         this.object = object;
     }
@@ -21,11 +21,11 @@ public class ChannelEvent {
         this.eventType = eventType;
     }
 
-    public Object getObject() {
+    public String getObject() {
         return object;
     }
 
-    public void setObject(Object object) {
+    public void setObject(String object) {
         this.object = object;
     }
 }
